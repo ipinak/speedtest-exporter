@@ -21,6 +21,7 @@ exposing the `/metrics` path.
 ## Metrics
 
 `speed_test_dl_speed` - your download speed in MBits
+
 `speed_test_ul_speed` - your upload speed in MBits
 
 # License
