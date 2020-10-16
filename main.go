@@ -38,12 +38,15 @@ var (
 	port       = ":8080"
 )
 
-var format string = `# speed_test_dl_speed
-speed_test_dl_speed %5.2f
-# speed_test_ul_speed
-speed_test_ul_speed %5.2f
-# speed_test_ping_ms
-speed_test_ping_ms %d`
+var format string = `# HELP speed_test_dl_speed_total speedtest-exporter: Download speed in Mbit/s of internet connection.
+# TYPE speed_test_dl_speed_total gauge
+speed_test_dl_speed_total{hostname="%s"} %5.2f
+# HELP speed_test_ul_speed_total speedtest-exporter: Upload speed in Mbit/s of internet connection.
+# TYPE speed_test_ul_speed_total gauge
+speed_test_ul_speed_total{hostname="%s"} %5.2f
+# HELP speed_test_ping_seconds_total speedtest-exporter: Ping time of internet connection.
+# TYPE speed_test_ping_seconds_total counter
+speed_test_ping_seconds_total{hostname="%s"} %f`
 
 func main() {
 	kingpin.Version("1.0.0")
@@ -51,6 +54,7 @@ func main() {
 
 	setTimeout()
 	setPort()
+	hostname, _ := os.Hostname()
 
 	user := fetchUserInfo()
 	user.Show()
@@ -83,7 +87,10 @@ func main() {
 		}
 	}()
 	http.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, format, result.AvgDL, result.AvgUL, result.AvgPing)
+		fmt.Fprintf(w, format,
+			hostname, result.AvgDL,
+			hostname, result.AvgUL,
+			hostname, result.AvgPing.Seconds())
 	})
 
 	fmt.Println(http.ListenAndServe(port, nil))
