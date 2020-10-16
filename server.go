@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"time"
 )
 
 // Server information
@@ -25,6 +26,7 @@ type Server struct {
 	Distance float64
 	DLSpeed  float64
 	ULSpeed  float64
+	Ping     time.Duration
 }
 
 // ServerList : List of Server
@@ -157,6 +159,7 @@ func (svrs Servers) StartTest() {
 		ulSpeed := uploadTest(s.URL, latency)
 		svrs[i].DLSpeed = dlSpeed
 		svrs[i].ULSpeed = ulSpeed
+		svrs[i].Ping = latency
 	}
 }
 
@@ -166,18 +169,22 @@ func (svrs Servers) ShowResult() {
 	if len(svrs) == 1 {
 		fmt.Printf("Download: %5.2f Mbit/s\n", svrs[0].DLSpeed)
 		fmt.Printf("Upload: %5.2f Mbit/s\n", svrs[0].ULSpeed)
+		fmt.Printf("Ping: %d ms\n", svrs[0].Ping)
 	} else {
 		for _, s := range svrs {
-			fmt.Printf("[%4s] Download: %5.2f Mbit/s, Upload: %5.2f Mbit/s\n", s.ID, s.DLSpeed, s.ULSpeed)
+			fmt.Printf("[%4s] Download: %5.2f Mbit/s, Upload: %5.2f Mbit/s, Ping: %d ms\n", s.ID, s.DLSpeed, s.ULSpeed, s.Ping)
 		}
 		avgDL := 0.0
 		avgUL := 0.0
+		avgPing := 0.0 * time.Millisecond
 		for _, s := range svrs {
 			avgDL = avgDL + s.DLSpeed
 			avgUL = avgUL + s.ULSpeed
+			avgPing = avgPing + s.Ping
 		}
 		fmt.Printf("Download Avg: %5.2f Mbit/s\n", avgDL/float64(len(svrs)))
 		fmt.Printf("Upload Avg: %5.2f Mbit/s\n", avgUL/float64(len(svrs)))
+		fmt.Printf("Ping: %d ms\n", avgPing)
 	}
 	err := svrs.checkResult()
 	if err {
@@ -186,8 +193,9 @@ func (svrs Servers) ShowResult() {
 }
 
 type Result struct {
-	AvgDL   float64 `json:"avgDL"`
-	AvgUL   float64 `json:"avgUL"`
+	AvgDL   float64       `json:"avgDL"`
+	AvgUL   float64       `json:"avgUL"`
+	AvgPing time.Duration `json:"avgPing"`
 	Servers Servers
 }
 
@@ -196,18 +204,22 @@ func (svrs Servers) GetResult() *Result {
 		return &Result{
 			AvgDL:   svrs[0].DLSpeed,
 			AvgUL:   svrs[0].ULSpeed,
+			AvgPing: svrs[0].Ping,
 			Servers: svrs,
 		}
 	} else {
 		avgDL := 0.0
 		avgUL := 0.0
+		avgPing := 0.0 * time.Millisecond
 		for _, s := range svrs {
 			avgDL = avgDL + s.DLSpeed
 			avgUL = avgUL + s.ULSpeed
+			avgPing = avgPing + s.Ping
 		}
 		return &Result{
 			AvgDL:   avgDL,
 			AvgUL:   avgUL,
+			AvgPing: avgPing,
 			Servers: svrs,
 		}
 	}
