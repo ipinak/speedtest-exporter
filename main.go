@@ -54,8 +54,8 @@ func main() {
 	update := make(chan Result, 1)
 	targets := list.FindServer(*serverIds)
 	go func() {
-		targets.StartTest()
 		for {
+			targets.StartTest()
 			result := targets.GetResult()
 			// send an update
 			update <- *result
