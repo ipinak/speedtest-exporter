@@ -86,6 +86,7 @@ func main() {
 			result = <-update
 		}
 	}()
+
 	http.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, format,
 			hostname, result.AvgDL,

@@ -26,6 +26,7 @@ func downloadTest(sURL string, latency time.Duration) float64 {
 		wg.Add(1)
 		go dlWarmUp(wg, dlURL)
 	}
+
 	wg.Wait()
 	fTime := time.Now()
 	// 1.125MB for each request (750 * 750 * 2)
@@ -56,6 +57,7 @@ func downloadTest(sURL string, latency time.Duration) float64 {
 			wg.Add(1)
 			go downloadRequest(wg, dlURL, weight)
 		}
+
 		wg.Wait()
 		fTime = time.Now()
 		fmt.Printf("\n")
@@ -78,6 +80,7 @@ func uploadTest(sURL string, latency time.Duration) float64 {
 		wg.Add(1)
 		go ulWarmUp(wg, sURL)
 	}
+
 	wg.Wait()
 	fTime := time.Now()
 	// 1.0 MB for each request
