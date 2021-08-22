@@ -166,6 +166,7 @@ func (svrs Servers) StartTest() {
 // ShowResult : show testing result
 func (svrs Servers) ShowResult() {
 	fmt.Printf(" \n")
+
 	if len(svrs) == 1 {
 		fmt.Printf("Download: %5.2f Mbit/s\n", svrs[0].DLSpeed)
 		fmt.Printf("Upload: %5.2f Mbit/s\n", svrs[0].ULSpeed)
@@ -174,6 +175,7 @@ func (svrs Servers) ShowResult() {
 		for _, s := range svrs {
 			fmt.Printf("[%4s] Download: %5.2f Mbit/s, Upload: %5.2f Mbit/s, Ping: %d ms\n", s.ID, s.DLSpeed, s.ULSpeed, s.Ping)
 		}
+
 		avgDL := 0.0
 		avgUL := 0.0
 		avgPing := 0.0 * time.Millisecond
@@ -182,10 +184,12 @@ func (svrs Servers) ShowResult() {
 			avgUL = avgUL + s.ULSpeed
 			avgPing = avgPing + s.Ping
 		}
+
 		fmt.Printf("Download Avg: %5.2f Mbit/s\n", avgDL/float64(len(svrs)))
 		fmt.Printf("Upload Avg: %5.2f Mbit/s\n", avgUL/float64(len(svrs)))
 		fmt.Printf("Ping: %d ms\n", avgPing)
 	}
+
 	err := svrs.checkResult()
 	if err {
 		fmt.Println("Warning: Result seems to be wrong. Please speedtest again.")
@@ -216,6 +220,7 @@ func (svrs Servers) GetResult() *Result {
 			avgUL = avgUL + s.ULSpeed
 			avgPing = avgPing + s.Ping
 		}
+
 		return &Result{
 			AvgDL:   avgDL,
 			AvgUL:   avgUL,
